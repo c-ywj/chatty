@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import ChatBar            from './ChatBar.jsx';
 import MessageList        from './MessageList.jsx';
-import Message            from './Message.jsx';
 
 class App extends Component {
 
@@ -37,11 +36,15 @@ class App extends Component {
     }, 3000);
   }
 
+  addNewMessage(msg) {
+    let messages = this.state.messages
+    this.setState({messages: messages.concat(msg)})
+  }
+
   render() {
     return (
       <div>
         <ChatBar currentUser={this.state.currentUser.name}></ChatBar>
-        <Message/>
         <MessageList messages={this.state.messages}></MessageList>
       </div>
     )
