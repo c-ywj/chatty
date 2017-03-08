@@ -21,6 +21,7 @@ class App extends Component {
         }
       ]
     }
+    this.addNewMessage = this.addNewMessage.bind(this)
   }
 
   componentDidMount() {
@@ -36,15 +37,23 @@ class App extends Component {
     }, 3000);
   }
 
-  addNewMessage(msg) {
-    let messages = this.state.messages
-    this.setState({messages: messages.concat(msg)})
+  addNewMessage(ev) {
+    if(ev.key == "Enter") {
+      let messages = this.state.messages
+      this.setState({
+        messages: messages.concat({
+          content: ev.target.value,
+          username: this.state.currentUser.name,
+          msgId: Math.random()
+        })
+      })
+    }
   }
 
   render() {
     return (
       <div>
-        <ChatBar currentUser={this.state.currentUser.name}></ChatBar>
+        <ChatBar currentUser={this.state.currentUser.name} addNewMessage={this.addNewMessage}></ChatBar>
         <MessageList messages={this.state.messages}></MessageList>
       </div>
     )
