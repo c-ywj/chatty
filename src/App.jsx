@@ -36,7 +36,6 @@ class App extends Component {
 
   }
 
-
   addNewMessage(ev) {
     if(ev.key === "Enter") {
       let message = {
@@ -48,11 +47,23 @@ class App extends Component {
     }
   }
 
+  handleChangeUser = (ev) => {
+    this.setState({
+      currentUser: {name: ev.target.value}
+    })
+  }
+
   render() {
     return (
       <div>
-        <ChatBar currentUser={this.state.currentUser.name} addNewMessage={this.addNewMessage}></ChatBar>
-        <MessageList messages={this.state.messages}></MessageList>
+        <ChatBar
+          handleChangeUser = {this.handleChangeUser}
+          addNewMessage    = {this.addNewMessage}
+          user             = {this.state.currentUser.name}
+        />
+        <MessageList
+          messages         = {this.state.messages}
+        />
       </div>
     )
   }
