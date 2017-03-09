@@ -11,7 +11,7 @@ class MessageList extends Component {
             return (
               <Message userName = {msg.username}
                        content  = {msg.content}
-                       key      = {msg.msgId}
+                       key      = {msg.uuid}
               />
             )
           })

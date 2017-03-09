@@ -1,5 +1,6 @@
 const express = require('express');
 const SocketServer = require('ws').Server;
+const uuid = require('node-uuid');
 
 // Set the port to 3001
 const PORT = 3001;
@@ -35,6 +36,9 @@ wss.broadcast = function(data) {
 }
 
 function echoBack(message) {
-  console.log(`Received: ${message}`)
-  wss.broadcast(message);
+  let parsedMsg = JSON.parse(message)
+  parsedMsg["uuid"] = uuid.v1();
+  let stringifiedMsg = JSON.stringify(parsedMsg)
+  console.log(`Received: ${stringifiedMsg}`)
+  wss.broadcast(stringifiedMsg);
 }

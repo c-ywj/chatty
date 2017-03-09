@@ -10,12 +10,12 @@ class App extends Component {
       currentUser: {name: "seewhy"},
       messages: [
         {
-          msgId: 0,
+          uuid: 0,
           username: "Bob",
           content: "Has anyone seen my marbles?",
         },
         {
-          msgId: 1,
+          uuid: 1,
           username: "Anonymous",
           content: "No, I think you lost them. You lost your marbles Bob. You lost them for good."
         }
@@ -41,8 +41,7 @@ class App extends Component {
     if(ev.key === "Enter") {
       let message = {
         content: ev.target.value,
-        username: this.state.currentUser.name,
-        msgId: Date.now()
+        username: this.state.currentUser.name
       }
       this.mySocket.send(JSON.stringify(message))
       ev.target.value = ""
