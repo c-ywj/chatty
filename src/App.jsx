@@ -26,24 +26,12 @@ class App extends Component {
 
   componentDidMount() {
     this.mySocket = new WebSocket("ws://localhost:3001");
-    console.log("componentDidMount <App />");
+    // console.log("componentDidMount <App />");
     this.mySocket.onmessage = (event) => {
       console.log(event.data)
-      let msg = JSON.parse(event.data)
+      let msg        = JSON.parse(event.data)
       let newMessage = this.state.messages.concat(msg)
       this.setState({messages: newMessage})
-    }
-
-  }
-
-  addNewMessage(ev) {
-    if(ev.key === "Enter") {
-      let message = {
-        content: ev.target.value,
-        username: this.state.currentUser.name
-      }
-      this.mySocket.send(JSON.stringify(message))
-      ev.target.value = ""
     }
   }
 
@@ -53,16 +41,39 @@ class App extends Component {
     })
   }
 
+  addNewMessage(ev) {
+    if(ev.key === "Enter") {
+      let message = {
+        type    : "postMessage",
+        content : ev.target.value,
+        username: this.state.currentUser.name
+      }
+      this.mySocket.send(JSON.stringify(message))
+      ev.target.value = ""
+    }
+  }
+
+  addNewNotification = (ev) => {
+    if(ev.key === "Enter") {
+      let noti = {
+        type    : "postNotification",
+        content : this.state.currentUser.name + " has changed their name to " + ev.target.value
+      }
+      this.mySocket.send(JSON.stringify(noti))
+      this.handleChangeUser(ev)
+    }
+  }
+
   render() {
     return (
       <div>
         <ChatBar
-          handleChangeUser = {this.handleChangeUser}
-          addNewMessage    = {this.addNewMessage}
-          user             = {this.state.currentUser.name}
+          addNewMessage      = {this.addNewMessage}
+          user               = {this.state.currentUser.name}
+          addNewNotification = {this.addNewNotification}
         />
         <MessageList
-          messages         = {this.state.messages}
+          messages           = {this.state.messages}
         />
       </div>
     )

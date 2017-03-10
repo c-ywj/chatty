@@ -3,13 +3,14 @@ import React, {Component} from 'react';
 class ChatBar extends Component {
 
   render() {
+    console.log(this.props.user)
     return (
       <footer className="chatbar">
         <input
-          className   = "chatbar-username"
-          value       = {this.props.user}
-          onChange    = {this.props.handleChangeUser}
-          placeholder = "Your Name (Optional)"
+          className    = "chatbar-username"
+          defaultValue = {this.props.user}
+          onKeyDown    = {this.props.addNewNotification}
+          placeholder  = "Your Name (Optional)"
         />
         <input
           className   = "chatbar-message"

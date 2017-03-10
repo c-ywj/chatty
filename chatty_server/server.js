@@ -21,7 +21,7 @@ wss.on('connection', (ws) => {
   console.log('Client connected');
 
   //what happens when clients send messages
-  ws.on('message', echoBack);
+  ws.on('message', onMessage);
 
   // Set up a callback for when a client closes the socket. This usually means they closed their browser.
   ws.on('close', () => console.log('Client disconnected'));
@@ -35,10 +35,20 @@ wss.broadcast = function(data) {
   });
 }
 
-function echoBack(message) {
+function onMessage(message) {
   let parsedMsg = JSON.parse(message)
   parsedMsg["uuid"] = uuid.v1();
-  let stringifiedMsg = JSON.stringify(parsedMsg)
-  console.log(`Received: ${stringifiedMsg}`)
-  wss.broadcast(stringifiedMsg);
+
+  if(parsedMsg.type === "postMessage") {
+    let msgResponse = {"type": "incomingMessage", "content": parsedMsg.content}
+    let stringifiedMsgResponse = JSON.stringify(msgResponse)
+    wss.broadcast(stringifiedMsgResponse)
+  } else if(parsedMsg.type === "postNotification") {
+    let notiResponse = {"type": "incomingNotification", "content": parsedMsg.content}
+    let stringifiedNotiResponse = JSON.stringify(notiResponse)
+    wss.broadcast(stringifiedNotiResponse)
+  }
+  // let stringifiedMsg = JSON.stringify(parsedMsg)
+  // console.log(`Received: ${stringifiedMsg}`)
+  // wss.broadcast(stringifiedMsg);
 }
