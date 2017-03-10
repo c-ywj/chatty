@@ -40,11 +40,11 @@ function onMessage(message) {
   parsedMsg["uuid"] = uuid.v1();
 
   if(parsedMsg.type === "postMessage") {
-    let msgResponse = {"type": "incomingMessage", "content": parsedMsg.content}
+    let msgResponse = {"uuid": uuid.v1(), "username": parsedMsg.username, "type": "incomingMessage", "content": parsedMsg.content}
     let stringifiedMsgResponse = JSON.stringify(msgResponse)
     wss.broadcast(stringifiedMsgResponse)
   } else if(parsedMsg.type === "postNotification") {
-    let notiResponse = {"type": "incomingNotification", "content": parsedMsg.content}
+    let notiResponse = {"uuid": uuid.v1(), "type": "incomingNotification", "content": parsedMsg.content}
     let stringifiedNotiResponse = JSON.stringify(notiResponse)
     wss.broadcast(stringifiedNotiResponse)
   }
