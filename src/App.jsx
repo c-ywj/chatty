@@ -26,13 +26,21 @@ class App extends Component {
 
   componentDidMount() {
     this.mySocket = new WebSocket("ws://localhost:3001");
-    // console.log("componentDidMount <App />");
-    this.mySocket.onmessage = (event) => {
-      console.log(event.data)
-      let msg        = JSON.parse(event.data)
-      let newMessage = this.state.messages.concat(msg)
-      this.setState({messages: newMessage})
+    this.mySocket.onopen = (event) => {
+      console.log("connected to server")
     }
+    this.mySocket.onmessage = (event) => {
+      if(event) {
+        let data = JSON.parse(event.data)
+        if(data.type === 'users') {
+          this.setState({users: data.users})
+        } else {
+            let newMessage = this.state.messages.concat(data)
+            this.setState({messages: newMessage})
+          }
+      }
+    }
+    console.log(this.state.users)
   }
 
   handleChangeUser = (ev) => {
@@ -67,6 +75,10 @@ class App extends Component {
   render() {
     return (
       <div>
+        <nav className="navbar">
+          <a href="/" className="navbar-brand">Chatty</a>
+          <span className="navbar-users">{this.state.users} Users online</span>
+        </nav>
         <ChatBar
           addNewMessage      = {this.addNewMessage}
           user               = {this.state.currentUser.name}

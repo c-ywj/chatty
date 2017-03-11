@@ -14,18 +14,26 @@ const server = express()
 // Create the WebSockets server
 const wss = new SocketServer({ server });
 
-// Set up a callback that will run when a client connects to the server
-// When a client connects they are assigned a socket, represented by
-// the ws parameter in the callback.
-wss.on('connection', (ws) => {
-  console.log('Client connected');
+let connects = 0;
 
-  //what happens when clients send messages
-  ws.on('message', onMessage);
+  function onMessage(message) {
+  let parsedMsg = JSON.parse(message)
 
-  // Set up a callback for when a client closes the socket. This usually means they closed their browser.
-  ws.on('close', () => console.log('Client disconnected'));
-});
+  if(parsedMsg.type === "postMessage") {
+    let msgResponse = {"uuid": uuid.v1(),
+                       "username": parsedMsg.username,
+                       "type": "incomingMessage",
+                       "content": parsedMsg.content}
+    let stringifiedMsgResponse = JSON.stringify(msgResponse)
+    wss.broadcast(stringifiedMsgResponse)
+  } else if(parsedMsg.type === "postNotification") {
+    let notiResponse = {"uuid": uuid.v1(),
+                        "type": "incomingNotification",
+                        "content": parsedMsg.content}
+    let stringifiedNotiResponse = JSON.stringify(notiResponse)
+    wss.broadcast(stringifiedNotiResponse)
+  }
+}
 
 wss.broadcast = function(data) {
   wss.clients.forEach(function(client) {
@@ -34,21 +42,27 @@ wss.broadcast = function(data) {
     }
   });
 }
+// Set up a callback that will run when a client connects to the server
+// When a client connects they are assigned a socket, represented by
+// the ws parameter in the callback.
+wss.on('connection', (ws) => {
+  console.log('Client connected');
+  users = {type: 'users', users: connects += 1};
+  console.log(users.users, "connected");
+  wss.clients.forEach(function(client) {
+    client.send(JSON.stringify(users))
+  })
 
-function onMessage(message) {
-  let parsedMsg = JSON.parse(message)
-  parsedMsg["uuid"] = uuid.v1();
+  //what happens when clients send messages
+  ws.on('message', onMessage);
 
-  if(parsedMsg.type === "postMessage") {
-    let msgResponse = {"uuid": uuid.v1(), "username": parsedMsg.username, "type": "incomingMessage", "content": parsedMsg.content}
-    let stringifiedMsgResponse = JSON.stringify(msgResponse)
-    wss.broadcast(stringifiedMsgResponse)
-  } else if(parsedMsg.type === "postNotification") {
-    let notiResponse = {"uuid": uuid.v1(), "type": "incomingNotification", "content": parsedMsg.content}
-    let stringifiedNotiResponse = JSON.stringify(notiResponse)
-    wss.broadcast(stringifiedNotiResponse)
-  }
-  // let stringifiedMsg = JSON.stringify(parsedMsg)
-  // console.log(`Received: ${stringifiedMsg}`)
-  // wss.broadcast(stringifiedMsg);
-}
+  // Set up a callback for when a client closes the socket. This usually means they closed their browser.
+  ws.on('close', () => {
+    console.log('Client disconnected')
+    users = {type: 'users', users: connects -= 1};
+    console.log(users.users, "remaining")
+    wss.clients.forEach(function(client) {
+      client.send(JSON.stringify(users))
+    })
+  });
+});
